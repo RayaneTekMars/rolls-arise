@@ -33,7 +33,7 @@ export default function Home() {
   const handleRoll = () => {
     setRolling(true);
     const rolledResult = roll();
-    const targetIndex = letters.indexOf(rolledResult);
+    const targetIndex = letters.indexOf(rolledResult as string);
     const totalLetters = letters.length;
     const spinCount = 5;
     const duration = 3000;
@@ -51,17 +51,17 @@ export default function Home() {
     }
 
     setTimeout(() => {
-      setResult(rolledResult);
+      setResult(rolledResult as string);
       setRolling(false);
     }, duration + 100);
   };
 
-  const handleSimulateRolls = (numRolls) => {
-    const results = { Player: 0, S: 0, A: 0, B: 0, C: 0, D: 0, E: 0 };
+  const handleSimulateRolls = (numRolls: number) => {
+    const results: { [key: string]: number } = { Player: 0, S: 0, A: 0, B: 0, C: 0, D: 0, E: 0 };
     for (let i = 0; i < numRolls; i++) {
       const rolledResult = roll();
-      if (results.hasOwnProperty(rolledResult)) {
-        results[rolledResult]++;
+      if (results.hasOwnProperty(rolledResult as string)) {
+        results[rolledResult as keyof typeof results]++;
       }
     }
     setSimulatedResults(results);
@@ -97,7 +97,7 @@ export default function Home() {
             min="1"
             placeholder="Nombre de rouleaux"
           />
-          <button onClick={() => handleSimulateRolls(Number(document.getElementById('numRolls').value))}>
+          <button onClick={() => handleSimulateRolls(Number((document.getElementById('numRolls') as HTMLInputElement)?.value))}>
             Simuler les Rouleaux
           </button>
         </div>
