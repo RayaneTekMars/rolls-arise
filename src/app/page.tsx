@@ -8,7 +8,7 @@ export default function Home() {
   const [rolling, setRolling] = useState(false);
 
   const probabilities = [
-    { name: 'Player', probability: 0.00001 },
+    { name: 'Player', probability: 0.0000001 },
     { name: 'S', probability: 0.0005 },
     { name: 'A', probability: 0.0195 },
     { name: 'B', probability: 0.08 },
@@ -87,7 +87,7 @@ export default function Home() {
           </div>
         </div>
         <button onClick={handleRoll} disabled={rolling}>
-          Rouler
+          Roll
         </button>
         <div className={styles.simulation}>
           <input
