@@ -74,17 +74,14 @@
 }
 
 .theme .A {
-  animation: pulse 2s infinite;
   background-color: #EAD1DC;
 }
 
 .theme .S {
-  animation: glow 2s infinite;
   background-color: #EA4335;
 }
 
 .theme .Player {
-  animation: shake 2s infinite;
   background-color: #00FFFF;
 }
 
@@ -117,7 +114,7 @@
 }
 
 .theme .simulation input {
-  padding: 10px;
+  padding: 5px;
   font-size: 1em;
   border: 2px solid var(--border-color);
   border-radius: 5px;
