@@ -95,10 +95,10 @@ export default function Home() {
             id="numRolls"
             name="numRolls"
             min="1"
-            placeholder="Nombre de rouleaux"
+            placeholder="Nombre de rolls"
           />
           <button onClick={() => handleSimulateRolls(Number((document.getElementById('numRolls') as HTMLInputElement)?.value))}>
-            Simuler les Rouleaux
+            Simuler les rolls
           </button>
         </div>
         {Object.keys(simulatedResults).length > 0 && (
