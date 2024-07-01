@@ -1,11 +1,29 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../styles/Home.module.scss';
 
+type Results = {
+  Player: number;
+  S: number;
+  A: number;
+  B: number;
+  C: number;
+  D: number;
+  E: number;
+};
+
 export default function Home() {
-  const [result, setResult] = useState('');
-  const [simulatedResults, setSimulatedResults] = useState({});
-  const [rolling, setRolling] = useState(false);
+  const [result, setResult] = useState<string>('');
+  const [simulatedResults, setSimulatedResults] = useState<Results>({
+    Player: 0,
+    S: 0,
+    A: 0,
+    B: 0,
+    C: 0,
+    D: 0,
+    E: 0,
+  });
+  const [rolling, setRolling] = useState<boolean>(false);
 
   const probabilities = [
     { name: 'Player', probability: 0.0000001 },
@@ -17,9 +35,9 @@ export default function Home() {
     { name: 'E', probability: 0.40 }
   ];
 
-  const letters = probabilities.map(prob => prob.name);
+  const items = probabilities.map(prob => prob.name);
 
-  const roll = () => {
+  const roll = (): string => {
     let rand = Math.random();
     let cumulative = 0;
     for (let i = 0; i < probabilities.length; i++) {
@@ -28,40 +46,45 @@ export default function Home() {
         return probabilities[i].name;
       }
     }
+    return 'E'; // default fallback, should never reach here
   };
 
   const handleRoll = () => {
     setRolling(true);
     const rolledResult = roll();
-    const targetIndex = letters.indexOf(rolledResult as string);
-    const totalLetters = letters.length;
-    const spinCount = 5;
+    const targetIndex = items.indexOf(rolledResult);
+    const totalItems = items.length;
+    const spinCount = 15;
     const duration = 3000;
 
     const rollBox = document.getElementById('rollBox');
     if (rollBox) {
+      rollBox.style.animation = 'none'; // Stop infinite animation during roll
       rollBox.style.transition = 'none';
-      rollBox.style.transform = 'translateY(0px)';
+      rollBox.style.transform = 'translateX(0px)';
 
       setTimeout(() => {
         rollBox.style.transition = `transform ${duration}ms cubic-bezier(0.33, 1, 0.68, 1)`;
-        const finalPosition = -(targetIndex + spinCount * totalLetters) * 120;
-        rollBox.style.transform = `translateY(${finalPosition}px)`;
+        const finalPosition = -(targetIndex + spinCount * totalItems) * 120 + 360 - 60;
+        rollBox.style.transform = `translateX(${finalPosition}px)`;
       }, 20);
     }
 
     setTimeout(() => {
-      setResult(rolledResult as string);
+      setResult(rolledResult);
       setRolling(false);
+      if (rollBox) {
+        rollBox.style.animation = 'scroll 20s linear infinite'; // Resume infinite animation
+      }
     }, duration + 100);
   };
 
   const handleSimulateRolls = (numRolls: number) => {
-    const results: { [key: string]: number } = { Player: 0, S: 0, A: 0, B: 0, C: 0, D: 0, E: 0 };
+    const results: Results = { Player: 0, S: 0, A: 0, B: 0, C: 0, D: 0, E: 0 };
     for (let i = 0; i < numRolls; i++) {
       const rolledResult = roll();
-      if (results.hasOwnProperty(rolledResult as string)) {
-        results[rolledResult as keyof typeof results]++;
+      if (rolledResult in results) {
+        results[rolledResult as keyof Results]++;
       }
     }
     setSimulatedResults(results);
@@ -70,18 +93,19 @@ export default function Home() {
   return (
     <div className={styles.theme}>
       <div className={styles.container}>
-        <h1>Simulateur de Rolls - Arise</h1>
+        <h1>Arise - Rank Rolls</h1>
         <div className={styles.rollContainer}>
+          <div className={styles.highlight}></div>
           <div className={styles.rollBox} id="rollBox">
             {Array(50)
-              .fill(letters)
+              .fill(items)
               .flat()
-              .map((letter, index) => (
+              .map((item, index) => (
                 <div
-                  className={`${styles.letter} ${styles[letter]}`}
+                  className={`${styles.item} ${styles[item]}`}
                   key={index}
                 >
-                  {letter}
+                  {item}
                 </div>
               ))}
           </div>
@@ -89,24 +113,35 @@ export default function Home() {
         <button onClick={handleRoll} disabled={rolling}>
           Roll
         </button>
+        {result && (
+          <p className={styles.result}>Vous avez obtenu : {result}</p>
+        )}
         <div className={styles.simulation}>
           <input
             type="number"
             id="numRolls"
             name="numRolls"
             min="1"
-            placeholder="Nombre de rolls"
+            placeholder="Number of rolls"
           />
-          <button onClick={() => handleSimulateRolls(Number((document.getElementById('numRolls') as HTMLInputElement)?.value))}>
-            Simuler les rolls
+          <button onClick={() => {
+            const numRollsInput = document.getElementById('numRolls') as HTMLInputElement;
+            if (numRollsInput) {
+              const numRolls = Number(numRollsInput.value);
+              if (!isNaN(numRolls) && numRolls > 0) {
+                handleSimulateRolls(numRolls);
+              }
+            }
+          }}>
+            Simulate Rolls
           </button>
         </div>
         {Object.keys(simulatedResults).length > 0 && (
           <div className={styles.results}>
-            <h2>Résultats de la Simulation :</h2>
+            <h2>Simulation Results:</h2>
             {Object.entries(simulatedResults).map(([key, value]) => (
               <p key={key}>
-                {key}: {String(value)}
+                {key}: {value}
               </p>
             ))}
           </div>
